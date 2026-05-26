@@ -7,7 +7,9 @@ pipeline {
         stage('Git Checkout') {
 
             steps {
-                git 'https://github.com/MADHU871/ai-employee-portal.git'
+
+                git branch: 'main',
+                url: 'https://github.com/MADHU871/ai-employee-portal.git'
             }
         }
 
@@ -34,7 +36,7 @@ pipeline {
 
                 docker run -d \
                 --name employee-container \
-                -p 5000:5000 \
+                -p 5001:5000 \
                 employee-backend
                 '''
             }
