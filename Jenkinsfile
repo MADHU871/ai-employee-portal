@@ -5,6 +5,7 @@ pipeline {
     environment {
 
         IMAGE_NAME = "employee-backend"
+
         CONTAINER_NAME = "employee-container"
 
     }
@@ -22,18 +23,55 @@ pipeline {
             }
         }
 
-        stage('Check Files') {
+        stage('Check Project Files') {
 
             steps {
 
                 sh '''
                 pwd
+
                 ls -la
+
+                echo "Frontend Files"
+
+                ls frontend
+
+                echo "Backend Files"
+
+                ls backend
                 '''
             }
         }
 
-        stage('Docker Build') {
+        stage('Frontend Install Dependencies') {
+
+            steps {
+
+                echo 'Installing Frontend Packages...'
+
+                sh '''
+                cd frontend
+
+                npm install
+                '''
+            }
+        }
+
+        stage('Frontend Build') {
+
+            steps {
+
+                echo 'Building React Frontend...'
+
+                sh '''
+                cd frontend
+
+                npm run build
+                '''
+            }
+        }
+
+        stage('Docker Build Backend') {
 
             steps {
 
@@ -47,11 +85,11 @@ pipeline {
             }
         }
 
-        stage('Docker Stop Old Container') {
+        stage('Stop Old Container') {
 
             steps {
 
-                echo 'Stopping Old Container...'
+                echo 'Stopping Old Docker Container...'
 
                 sh '''
                 docker stop $CONTAINER_NAME || true
@@ -61,11 +99,11 @@ pipeline {
             }
         }
 
-        stage('Docker Run New Container') {
+        stage('Run New Container') {
 
             steps {
 
-                echo 'Running New Container...'
+                echo 'Running New Docker Container...'
 
                 sh '''
                 docker run -d \
@@ -80,6 +118,8 @@ pipeline {
 
             steps {
 
+                echo 'Checking Docker Container Status...'
+
                 sh '''
                 docker ps
                 '''
@@ -91,7 +131,7 @@ pipeline {
 
         success {
 
-            echo 'Pipeline Executed Successfully!'
+            echo 'CI/CD Pipeline Executed Successfully!'
         }
 
         failure {
